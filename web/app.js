@@ -168,7 +168,14 @@ function renderMatrix(containerId, rows, rowKey, firstHeader, clickHandler) {
   });
   table.append(tbody);
   attachSort(table);
-  replaceContent(containerId, table);
+  replaceContent(containerId, wrapScrollable(table));
+}
+
+function wrapScrollable(table) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "table-scroll";
+  wrapper.append(table);
+  return wrapper;
 }
 
 function renderDetailTable(containerId, rows, columns) {
@@ -201,7 +208,7 @@ function renderDetailTable(containerId, rows, columns) {
     });
   table.append(tbody);
   attachSort(table);
-  replaceContent(containerId, table);
+  replaceContent(containerId, wrapScrollable(table));
 }
 
 function makeHeader(headers) {
@@ -278,7 +285,7 @@ function renderBarChart(id, data, options = {}) {
   if (!data.length) return;
   const width = el.clientWidth || 520;
   const height = el.clientHeight || 300;
-  const margin = options.orientation === "horizontal" ? { top: 18, right: 78, bottom: 38, left: 150 } : { top: 18, right: 24, bottom: 54, left: 66 };
+  const margin = options.orientation === "horizontal" ? { top: 18, right: 78, bottom: 76, left: 150 } : { top: 18, right: 24, bottom: 76, left: 66 };
   const svg = svgEl(width, height);
   const max = niceMax(Math.max(...data.map((d) => d.value), 1));
   const plotW = width - margin.left - margin.right;
@@ -306,7 +313,7 @@ function renderBarChart(id, data, options = {}) {
       const bar = rect(x, y, barW, h, "#2f6f73");
       addTitle(bar, `${d.name}: ${fmt(d.value)} 万吨`);
       svg.append(bar);
-      svg.append(text(x + barW / 2, height - 24, d.name, "tick", true));
+      svg.append(text(x + barW / 2, height - 38, d.name, "tick", true));
     });
   }
   el.append(svg);
@@ -318,7 +325,7 @@ function renderLineChart(id, data) {
   if (!data.length) return;
   const width = el.clientWidth || 520;
   const height = el.clientHeight || 300;
-  const margin = { top: 18, right: 26, bottom: 54, left: 66 };
+  const margin = { top: 18, right: 26, bottom: 76, left: 66 };
   const svg = svgEl(width, height);
   const max = niceMax(Math.max(...data.map((d) => d.value), 1));
   const plotW = width - margin.left - margin.right;
@@ -339,7 +346,7 @@ function renderLineChart(id, data) {
     const dot = circle(point.x, point.y, 4, "#b05c2a");
     addTitle(dot, `${point.name}: ${fmt(point.value)} 万吨`);
     svg.append(dot);
-    svg.append(text(point.x, height - 24, point.name, "tick", true));
+    svg.append(text(point.x, height - 38, point.name, "tick", true));
   });
   el.append(svg);
 }
@@ -352,7 +359,7 @@ function renderStackedChart(id, rows) {
   if (!months.length || !series.length) return;
   const width = el.clientWidth || 520;
   const height = el.clientHeight || 320;
-  const margin = { top: 18, right: 140, bottom: 54, left: 66 };
+  const margin = { top: 18, right: 140, bottom: 76, left: 66 };
   const svg = svgEl(width, height);
   const plotW = width - margin.left - margin.right;
   const plotH = height - margin.top - margin.bottom;
@@ -372,7 +379,7 @@ function renderStackedChart(id, rows) {
       addTitle(bar, `${month} ${name}: ${fmt(value)} 万吨`);
       svg.append(bar);
     });
-    svg.append(text(x + barW / 2, height - 24, month, "tick", true));
+    svg.append(text(x + barW / 2, height - 38, month, "tick", true));
   });
   drawLegend(svg, width - margin.right + 14, margin.top, series);
   el.append(svg);
@@ -461,7 +468,7 @@ function text(x, y, value, cls, rotate = false, anchor = null) {
   if (anchor) node.setAttribute("text-anchor", anchor);
   if (rotate) {
     node.setAttribute("text-anchor", "end");
-    node.setAttribute("transform", `rotate(-35 ${x} ${y})`);
+    node.setAttribute("transform", `rotate(-25 ${x} ${y})`);
   }
   node.textContent = value;
   return node;
@@ -479,3 +486,4 @@ function trimLabel(value, max) {
 }
 
 loadData();
+

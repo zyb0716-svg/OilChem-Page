@@ -120,20 +120,31 @@ input {
 .block {
   margin-bottom: 16px;
   padding: 18px;
-  overflow: auto;
+  overflow: hidden;
   border-radius: 8px;
 }
 
-.chart { min-height: 340px; width: 100%; }
+.chart { min-height: 360px; width: 100%; padding-bottom: 4px; }
 svg { width: 100%; height: 100%; min-height: inherit; }
 svg text { fill: var(--muted); font-size: 14px; }
 svg .axis, svg .tick { font-size: 13px; }
 svg .value { fill: var(--text); font-size: 13px; }
 svg .legend { fill: var(--text); font-size: 13px; }
 
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 8px;
+}
+
+.table-scroll::-webkit-scrollbar { height: 10px; }
+.table-scroll::-webkit-scrollbar-thumb { background: #b8c2bd; border-radius: 999px; }
+.table-scroll::-webkit-scrollbar-track { background: #eef3f1; border-radius: 999px; }
+
 .data-table {
   width: 100%;
-  min-width: 780px;
+  min-width: max(780px, 100%);
   border-collapse: collapse;
   font-size: 15px;
 }
@@ -185,3 +196,4 @@ svg .legend { fill: var(--text); font-size: 13px; }
   .tab { flex: 1; }
   .query-panel { grid-template-columns: 1fr; }
 }
+
