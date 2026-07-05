@@ -1,0 +1,6 @@
+﻿source_file,month,status,sheet_found,raw_data_rows,records_generated,empty_oil_name_count,used_cn_as_oil_name_count,empty_refinery_count,invalid_number_count,source_total_10kt,detail_total_10kt,total_diff_10kt,total_diff_pct,messages
+OILCHEM中国独立炼厂数据监测报告202601.xlsx,2026-01,ok,True,59,74,0,0,2,0,1760.31,1760.31,-0.0,-0.0,BT列英文油种名含中文字符，已清洗为: Indonesia Blend/Singma/Leng blend；BD列中英文油种名反置，已修正为 ARABIAN / 沙特原油
+OILCHEM中国独立炼厂数据监测报告202602.xlsx,2026-02,ok,True,59,69,0,0,2,0,1587.12,1587.1,-0.02,-1.3e-05,BT列英文油种名含中文字符，已清洗为: Indonesia Blend/Singma/Leng blend；BD列中英文油种名反置，已修正为 ARABIAN / 沙特原油
+OILCHEM中国独立炼厂数据监测报告202603.xlsx,2026-03,ok,True,59,66,0,0,2,0,1684.4,1684.4,0.0,0.0,BT列英文油种名含中文字符，已清洗为: Indonesia Blend/Singma/Leng blend；BD列中英文油种名反置，已修正为 ARABIAN / 沙特原油
+OILCHEM中国独立炼厂数据监测报告202604.xlsx,2026-04,ok,True,59,57,0,0,2,0,1541.86,1541.86,-0.0,-0.0,BT列英文油种名含中文字符，已清洗为: Indonesia Blend/Singma/Leng blend；BD列中英文油种名反置，已修正为 ARABIAN / 沙特原油
+OILCHEM中国独立炼厂数据监测报告202605.xlsx,2026-05,ok,True,59,63,0,0,2,0,1567.64,1567.64,0.0,0.0,BT列英文油种名含中文字符，已清洗为: Indonesia Blend/Singma/Leng blend；BD列中英文油种名反置，已修正为 ARABIAN / 沙特原油

@@ -1,0 +1,109 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>独立炼厂进口原油查询</title>
+    <link rel="stylesheet" href="style.css?v=20260705b" />
+  </head>
+  <body>
+    <header class="page-header">
+      <h1>独立炼厂进口原油查询</h1>
+    </header>
+
+    <main>
+      <section class="local-load" id="localLoad" hidden>
+        <span>浏览器阻止直接读取本地 JSON。请选择生成后的 JSON 文件：</span>
+        <input id="jsonFileInput" type="file" accept=".json,application/json" />
+      </section>
+
+      <nav class="tabs" aria-label="页面切换">
+        <button class="tab active" data-tab="refinery" type="button">按炼厂查询</button>
+        <button class="tab" data-tab="oil" type="button">按油种查询</button>
+      </nav>
+
+      <section id="refinery" class="panel active">
+        <section class="query-panel">
+          <label>
+            选择炼厂
+            <select id="refinerySelect"></select>
+          </label>
+          <label>
+            查询月份起
+            <select id="refineryMonthStart"></select>
+          </label>
+          <label>
+            查询月份止
+            <select id="refineryMonthEnd"></select>
+          </label>
+          <div class="metric inline-metric">
+            <span>累计采购</span>
+            <strong id="refineryTotal">-</strong>
+          </div>
+        </section>
+
+        <div class="grid two">
+          <section class="block">
+            <h2>月度进口原油总量</h2>
+            <div id="refineryMonthlyChart" class="chart"></div>
+          </section>
+          <section class="block">
+            <h2>分油种采购情况</h2>
+            <div id="refineryStackChart" class="chart"></div>
+          </section>
+        </div>
+        <section class="block">
+          <h2>炼厂-油种月度矩阵</h2>
+          <div id="refineryMatrix"></div>
+        </section>
+        <section class="block">
+          <h2>采购明细</h2>
+          <div id="refineryDetail"></div>
+        </section>
+      </section>
+
+      <section id="oil" class="panel">
+        <section class="query-panel">
+          <label>
+            选择油种
+            <select id="oilSelect"></select>
+          </label>
+          <label>
+            查询月份起
+            <select id="oilMonthStart"></select>
+          </label>
+          <label>
+            查询月份止
+            <select id="oilMonthEnd"></select>
+          </label>
+          <div class="metric inline-metric">
+            <span>累计采购</span>
+            <strong id="oilTotal">-</strong>
+          </div>
+        </section>
+
+        <div class="grid two">
+          <section class="block">
+            <h2>月度采购总量</h2>
+            <div id="oilMonthlyChart" class="chart"></div>
+          </section>
+          <section class="block">
+            <h2>分炼厂采购量</h2>
+            <div id="oilRefineryChart" class="chart"></div>
+          </section>
+        </div>
+        <section class="block">
+          <h2>油种-炼厂月度矩阵</h2>
+          <div id="oilMatrix"></div>
+        </section>
+        <section class="block">
+          <h2>采购明细</h2>
+          <div id="oilDetail"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="app.js?v=20260705a"></script>
+  </body>
+</html>
+
