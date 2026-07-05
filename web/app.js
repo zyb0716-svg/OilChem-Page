@@ -54,13 +54,23 @@ function initialize(records) {
   populateSelect($("oilMonthStart"), state.months);
   populateSelect($("oilMonthEnd"), state.months);
 
-  $("refineryMonthStart").value = state.months[0] || "";
-  $("oilMonthStart").value = state.months[0] || "";
-  $("refineryMonthEnd").value = state.months[state.months.length - 1] || "";
-  $("oilMonthEnd").value = state.months[state.months.length - 1] || "";
+  resetMonthRangesToLatest();
 
   bindEvents();
   renderActive();
+}
+
+function latestMonth() {
+  return state.months[state.months.length - 1] || "";
+}
+
+function resetMonthRangesToLatest() {
+  const firstMonth = state.months[0] || "";
+  const lastMonth = latestMonth();
+  $("refineryMonthStart").value = firstMonth;
+  $("oilMonthStart").value = firstMonth;
+  $("refineryMonthEnd").value = lastMonth;
+  $("oilMonthEnd").value = lastMonth;
 }
 
 function bindEvents() {
@@ -486,4 +496,5 @@ function trimLabel(value, max) {
 }
 
 loadData();
+
 
