@@ -398,9 +398,17 @@ function renderStackedChart(id, rows) {
   const months = uniq(rows.map((row) => row.month));
   const series = groupSum(rows, (row) => row.oil_name_en).slice(0, 10).map((item) => item.name);
   if (!months.length || !series.length) return;
+  if (months.length <= 2) {
+    renderCompactStackedBars(el, months, series, rows);
+    return;
+  }
+  renderStackedArea(el, months, series, rows);
+}
+
+function renderCompactStackedBars(el, months, series, rows) {
   const width = el.clientWidth || 520;
   const height = el.clientHeight || 320;
-  const margin = { top: 18, right: 140, bottom: 76, left: 66 };
+  const margin = { top: 18, right: 150, bottom: 76, left: 66 };
   const svg = svgEl(width, height);
   const plotW = width - margin.left - margin.right;
   const plotH = height - margin.top - margin.bottom;
@@ -411,13 +419,16 @@ function renderStackedChart(id, rows) {
   const tickIndexes = visibleTimeTickSet(months);
   months.forEach((month, i) => {
     let yBase = margin.top + plotH;
-    const x = margin.left + i * step + step * 0.25;
-    const barW = step * 0.5;
+    const barW = Math.min(54, Math.max(24, step * 0.62));
+    const x = margin.left + i * step + (step - barW) / 2;
     series.forEach((name, j) => {
       const value = sum(rows.filter((row) => row.month === month && row.oil_name_en === name));
-      const h = (value / max) * plotH;
+      if (!value) return;
+      const h = Math.max(1.5, (value / max) * plotH);
       yBase -= h;
       const bar = rect(x, yBase, barW, h, COLORS[j % COLORS.length]);
+      bar.setAttribute("rx", 3);
+      bar.setAttribute("opacity", "0.95");
       addTitle(bar, `${month} ${name}: ${fmt(value)} 万吨`);
       svg.append(bar);
     });
@@ -427,6 +438,54 @@ function renderStackedChart(id, rows) {
   el.append(svg);
 }
 
+function renderStackedArea(el, months, series, rows) {
+  const width = el.clientWidth || 520;
+  const height = el.clientHeight || 320;
+  const margin = { top: 18, right: 150, bottom: 76, left: 66 };
+  const svg = svgEl(width, height);
+  const plotW = width - margin.left - margin.right;
+  const plotH = height - margin.top - margin.bottom;
+  const valuesBySeries = series.map((name) => months.map((month) => sum(rows.filter((row) => row.month === month && row.oil_name_en === name))));
+  const totals = months.map((_, index) => valuesBySeries.reduce((acc, values) => acc + values[index], 0));
+  const max = niceMax(Math.max(...totals, 1));
+  drawAxes(svg, margin, plotW, plotH, max, "vertical");
+
+  const xFor = (index) => margin.left + (months.length === 1 ? plotW / 2 : (index / (months.length - 1)) * plotW);
+  const yFor = (value) => margin.top + plotH - (value / max) * plotH;
+  const lower = new Array(months.length).fill(0);
+
+  valuesBySeries.forEach((values, seriesIndex) => {
+    const upper = lower.map((base, index) => base + values[index]);
+    const top = upper.map((value, index) => [xFor(index), yFor(value)]);
+    const bottom = lower.map((value, index) => [xFor(index), yFor(value)]).reverse();
+    const d = [...top, ...bottom].map(([x, y], index) => `${index ? "L" : "M"}${x},${y}`).join(" ") + " Z";
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", d);
+    path.setAttribute("fill", COLORS[seriesIndex % COLORS.length]);
+    path.setAttribute("opacity", "0.88");
+    path.setAttribute("stroke", "#ffffff");
+    path.setAttribute("stroke-width", "1.2");
+    path.setAttribute("stroke-linejoin", "round");
+    addTitle(path, `${series[seriesIndex]}，累计 ${fmt(values.reduce((a, b) => a + b, 0))} 万吨`);
+    svg.append(path);
+    upper.forEach((value, index) => { lower[index] = value; });
+  });
+
+  const totalLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  totalLine.setAttribute("d", totals.map((value, index) => `${index ? "L" : "M"}${xFor(index)},${yFor(value)}`).join(" "));
+  totalLine.setAttribute("fill", "none");
+  totalLine.setAttribute("stroke", "#263b3a");
+  totalLine.setAttribute("stroke-width", "1.8");
+  totalLine.setAttribute("opacity", "0.45");
+  svg.append(totalLine);
+
+  const tickIndexes = visibleTimeTickSet(months);
+  months.forEach((month, i) => {
+    if (tickIndexes.has(i)) svg.append(text(xFor(i), height - 38, month, "tick", true));
+  });
+  drawLegend(svg, width - margin.right + 14, margin.top, series);
+  el.append(svg);
+}
 function drawAxes(svg, margin, plotW, plotH, max, orientation) {
   const axis = "#9aa4a0";
   const grid = "#e3e7e1";
@@ -528,6 +587,7 @@ function trimLabel(value, max) {
 }
 
 loadData();
+
 
 
 
