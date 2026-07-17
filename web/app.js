@@ -289,6 +289,14 @@ function jumpToRefinery(name) {
   switchTab("refinery");
 }
 
+function shouldShowTimeTick(name, index, total) {
+  if (total <= 12) return true;
+  if (index === 0 || index === total - 1) return true;
+  const month = String(name || "").slice(5, 7);
+  if (month === "01") return true;
+  if (total <= 24) return index % 2 === 0;
+  return false;
+}
 function renderBarChart(id, data, options = {}) {
   const el = $(id);
   el.innerHTML = "";
@@ -323,7 +331,7 @@ function renderBarChart(id, data, options = {}) {
       const bar = rect(x, y, barW, h, "#2f6f73");
       addTitle(bar, `${d.name}: ${fmt(d.value)} 万吨`);
       svg.append(bar);
-      svg.append(text(x + barW / 2, height - 38, d.name, "tick", true));
+      if (shouldShowTimeTick(d.name, i, data.length)) svg.append(text(x + barW / 2, height - 38, d.name, "tick", true));
     });
   }
   el.append(svg);
@@ -356,7 +364,7 @@ function renderLineChart(id, data) {
     const dot = circle(point.x, point.y, 4, "#b05c2a");
     addTitle(dot, `${point.name}: ${fmt(point.value)} 万吨`);
     svg.append(dot);
-    svg.append(text(point.x, height - 38, point.name, "tick", true));
+    if (shouldShowTimeTick(point.name, points.indexOf(point), points.length)) svg.append(text(point.x, height - 38, point.name, "tick", true));
   });
   el.append(svg);
 }
@@ -389,7 +397,7 @@ function renderStackedChart(id, rows) {
       addTitle(bar, `${month} ${name}: ${fmt(value)} 万吨`);
       svg.append(bar);
     });
-    svg.append(text(x + barW / 2, height - 38, month, "tick", true));
+    if (shouldShowTimeTick(month, i, months.length)) svg.append(text(x + barW / 2, height - 38, month, "tick", true));
   });
   drawLegend(svg, width - margin.right + 14, margin.top, series);
   el.append(svg);
@@ -496,5 +504,6 @@ function trimLabel(value, max) {
 }
 
 loadData();
+
 
 
