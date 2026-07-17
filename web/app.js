@@ -289,13 +289,34 @@ function jumpToRefinery(name) {
   switchTab("refinery");
 }
 
-function shouldShowTimeTick(name, index, total) {
-  if (total <= 12) return true;
-  if (index === 0 || index === total - 1) return true;
-  const month = String(name || "").slice(5, 7);
-  if (month === "01") return true;
-  if (total <= 24) return index % 2 === 0;
-  return false;
+function visibleTimeTickSet(names) {
+  const total = names.length;
+  const visible = new Set();
+  if (total <= 12) {
+    names.forEach((_, index) => visible.add(index));
+    return visible;
+  }
+
+  const minGap = total <= 24 ? 3 : 6;
+  visible.add(0);
+  let lastShown = 0;
+
+  names.forEach((name, index) => {
+    if (index === 0 || index === total - 1) return;
+    const month = String(name || "").slice(5, 7);
+    const regularTick = total <= 24 ? index % minGap === 0 : month === "01";
+    if (regularTick && index - lastShown >= minGap) {
+      visible.add(index);
+      lastShown = index;
+    }
+  });
+
+  const lastIndex = total - 1;
+  if (lastIndex - lastShown < minGap && lastShown !== 0) {
+    visible.delete(lastShown);
+  }
+  visible.add(lastIndex);
+  return visible;
 }
 function renderBarChart(id, data, options = {}) {
   const el = $(id);
@@ -323,6 +344,7 @@ function renderBarChart(id, data, options = {}) {
     });
   } else {
     const step = plotW / data.length;
+    const tickIndexes = visibleTimeTickSet(data.map((d) => d.name));
     data.forEach((d, i) => {
       const barW = Math.max(12, step * 0.52);
       const h = (d.value / max) * plotH;
@@ -331,7 +353,7 @@ function renderBarChart(id, data, options = {}) {
       const bar = rect(x, y, barW, h, "#2f6f73");
       addTitle(bar, `${d.name}: ${fmt(d.value)} 万吨`);
       svg.append(bar);
-      if (shouldShowTimeTick(d.name, i, data.length)) svg.append(text(x + barW / 2, height - 38, d.name, "tick", true));
+      if (tickIndexes.has(i)) svg.append(text(x + barW / 2, height - 38, d.name, "tick", true));
     });
   }
   el.append(svg);
@@ -349,6 +371,7 @@ function renderLineChart(id, data) {
   const plotW = width - margin.left - margin.right;
   const plotH = height - margin.top - margin.bottom;
   drawAxes(svg, margin, plotW, plotH, max, "vertical");
+  const tickIndexes = visibleTimeTickSet(data.map((d) => d.name));
   const points = data.map((d, i) => {
     const x = margin.left + (data.length === 1 ? plotW / 2 : (i / (data.length - 1)) * plotW);
     const y = margin.top + plotH - (d.value / max) * plotH;
@@ -364,7 +387,7 @@ function renderLineChart(id, data) {
     const dot = circle(point.x, point.y, 4, "#b05c2a");
     addTitle(dot, `${point.name}: ${fmt(point.value)} 万吨`);
     svg.append(dot);
-    if (shouldShowTimeTick(point.name, points.indexOf(point), points.length)) svg.append(text(point.x, height - 38, point.name, "tick", true));
+    if (tickIndexes.has(points.indexOf(point))) svg.append(text(point.x, height - 38, point.name, "tick", true));
   });
   el.append(svg);
 }
@@ -385,6 +408,7 @@ function renderStackedChart(id, rows) {
   const max = niceMax(Math.max(...totals, 1));
   drawAxes(svg, margin, plotW, plotH, max, "vertical");
   const step = plotW / months.length;
+  const tickIndexes = visibleTimeTickSet(months);
   months.forEach((month, i) => {
     let yBase = margin.top + plotH;
     const x = margin.left + i * step + step * 0.25;
@@ -397,7 +421,7 @@ function renderStackedChart(id, rows) {
       addTitle(bar, `${month} ${name}: ${fmt(value)} 万吨`);
       svg.append(bar);
     });
-    if (shouldShowTimeTick(month, i, months.length)) svg.append(text(x + barW / 2, height - 38, month, "tick", true));
+    if (tickIndexes.has(i)) svg.append(text(x + barW / 2, height - 38, month, "tick", true));
   });
   drawLegend(svg, width - margin.right + 14, margin.top, series);
   el.append(svg);
@@ -504,6 +528,7 @@ function trimLabel(value, max) {
 }
 
 loadData();
+
 
 
 
